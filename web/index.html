@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="异环原生 HDR 一键开启工具 / NTE HDR Panel，写入 UE Engine.ini HDR 输出配置，支持备份恢复、只读保护和 NVIDIA HUD 验证。">
+    <meta name="keywords" content="异环 HDR,异环原生 HDR,异环怎么开 HDR,异环 HDR Mode Custom,NTE HDR Panel,Neverness To Everness HDR,Ananta HDR,UE HDR,Engine.ini HDR">
+    <title>异环原生 HDR 一键开启工具 - NTE HDR Panel</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="settings-window">
+      <aside class="sidebar">
+        <div class="traffic-lights" aria-hidden="true">
+          <span class="close"></span>
+          <span class="minimize"></span>
+          <span class="zoom"></span>
+        </div>
+
+        <div class="app-title">
+          <div class="app-icon">HDR</div>
+          <div>
+            <p class="eyebrow">Local Control Surface</p>
+            <h1>异环 HDR 面板</h1>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="页面导航">
+          <a href="#config" class="active">配置目录</a>
+          <a href="#params">HDR 参数</a>
+          <a href="#hud">NVIDIA HUD</a>
+          <a href="#verify">验证步骤</a>
+          <a href="#backup">备份恢复</a>
+        </nav>
+
+        <div class="sidebar-card">
+          <span id="assetPill" class="status-pill">检查配置中</span>
+          <p>默认写入后设为只读，避免游戏启动阶段重写 <code>Engine.ini</code>。</p>
+        </div>
+
+        <div class="sidebar-actions">
+          <button id="themeToggle" class="secondary" type="button">浅色 / 深色</button>
+          <button id="shutdownBtn" class="danger secondary" type="button">退出工具</button>
+        </div>
+      </aside>
+
+      <section class="content">
+        <header class="content-header">
+          <div>
+            <p class="eyebrow">Neverness To Everness</p>
+            <h2>异环原生 HDR 一键开启工具</h2>
+            <p>
+              只修改本机 <code>%LOCALAPPDATA%\HT\Saved\Config\Windows\Engine.ini</code>。
+              不是 RTX HDR，也不是 Windows 自动 HDR，不注入游戏进程。
+            </p>
+          </div>
+          <div class="summary-tile" aria-hidden="true">
+            <strong id="peakPreview">1000</strong>
+            <span>nits peak</span>
+          </div>
+        </header>
+
+        <section id="config" class="settings-group">
+          <div class="group-header">
+            <span>01</span>
+            <div>
+              <h3>配置目录</h3>
+              <p>默认路径就是异环本地 UE 配置目录。如果目录不存在，先启动一次游戏。</p>
+            </div>
+          </div>
+
+          <div class="setting-row vertical">
+            <label for="configPath">Engine.ini 所在目录</label>
+            <div class="path-row">
+              <input id="configPath" type="text" spellcheck="false">
+              <button id="browseBtn" class="secondary" type="button">浏览</button>
+            </div>
+            <div class="button-row">
+              <button id="detectBtn" class="secondary" type="button">检测配置</button>
+              <button id="openDirBtn" class="secondary" type="button">复制路径</button>
+            </div>
+          </div>
+
+          <div id="detectCard" class="mini-card muted">
+            正在读取本机状态。
+          </div>
+        </section>
+
+        <section id="params" class="settings-group">
+          <div class="group-header">
+            <span>02</span>
+            <div>
+              <h3>HDR 参数</h3>
+              <p>默认使用 UE 常见参考值。画面偏暗时，优先调高中间亮度参考值。</p>
+            </div>
+          </div>
+
+          <div class="preset-grid">
+            <button class="preset active" data-max="1000" data-mid="18" data-ui="1.0" type="button">
+              <strong>UE 默认</strong>
+              <span>1000 / 18 / 1.0</span>
+            </button>
+            <button class="preset" data-max="1000" data-mid="120" data-ui="1.0" type="button">
+              <strong>偏亮</strong>
+              <span>1000 / 120 / 1.0</span>
+            </button>
+            <button class="preset" data-max="2000" data-mid="250" data-ui="1.0" type="button">
+              <strong>高亮屏</strong>
+              <span>2000 / 250 / 1.0</span>
+            </button>
+          </div>
+
+          <div class="settings-list">
+            <div class="setting-row">
+              <label for="maxLuminance">显示器最大亮度</label>
+              <div class="control-with-unit">
+                <input id="maxLuminance" type="text" inputmode="decimal" value="1000">
+                <span>nits</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <label for="midLuminance">中间亮度参考值</label>
+              <input id="midLuminance" type="text" inputmode="decimal" value="18">
+            </div>
+            <div class="setting-row">
+              <label for="uiLevel">UI 亮度</label>
+              <input id="uiLevel" type="text" inputmode="decimal" value="1.0">
+            </div>
+            <label class="setting-row check-row" for="readOnly">
+              <span>写入后设为只读</span>
+              <input id="readOnly" type="checkbox" checked>
+            </label>
+          </div>
+
+          <div id="paramExplain" class="mini-card">
+            <strong>写入内容</strong><br>
+            <code>r.HDR.EnableHDROutput=1</code> 开启 UE HDR 输出。<br>
+            <code>r.HDR.Display.MaxLuminance</code> 填显示器 HDR 峰值亮度。<br>
+            <code>r.HDR.Display.MidLuminance</code> 控制中间调，偏暗就上调。
+          </div>
+
+          <button id="applyBtn" class="primary action-main" type="button">备份并写入原生 HDR</button>
+          <div id="statusStrip" class="status-strip"></div>
+        </section>
+
+        <section id="hud" class="settings-group">
+          <div class="group-header">
+            <span>03</span>
+            <div>
+              <h3>NVIDIA HUD 验证</h3>
+              <p>用于确认 DX12 / DLSS / HDR Mode。写注册表需要管理员权限。</p>
+            </div>
+          </div>
+
+          <div id="hudCard" class="mini-card muted">
+            正在检测 HUD 状态。
+          </div>
+
+          <div class="button-row">
+            <button id="refreshHudBtn" class="secondary" type="button">重新检测 HUD</button>
+            <button id="enableHudBtn" class="primary" type="button">开启 HUD</button>
+            <button id="disableHudBtn" class="secondary" type="button">关闭 HUD</button>
+          </div>
+
+          <p class="note">面板只读普通进程名，不读取游戏模块，避免再次触发“黑客工具”检测。</p>
+        </section>
+
+        <section id="verify" class="settings-group">
+          <div class="group-header">
+            <span>04</span>
+            <div>
+              <h3>验证步骤</h3>
+              <p>写入后启动游戏，用 HUD 直接看渲染链路。</p>
+            </div>
+          </div>
+
+          <div class="step-grid">
+            <div>
+              <strong>1. 写入</strong>
+              <span>点击“备份并写入原生 HDR”。</span>
+            </div>
+            <div>
+              <strong>2. 启动</strong>
+              <span>保持 HUD 开启，再启动异环。</span>
+            </div>
+            <div>
+              <strong>3. 识别</strong>
+              <span>HUD 出现 <code>DX12</code> / <code>D3D12</code> 和 <code>HDR Mode: Custom</code>。</span>
+            </div>
+            <div>
+              <strong>4. 排错</strong>
+              <span>如提示黑客工具，先关闭 Procmon、调试器、Process Explorer。</span>
+            </div>
+          </div>
+
+          <div id="filePlan" class="mini-card">
+            写入范围会在检测后显示。
+          </div>
+        </section>
+
+        <section id="backup" class="settings-group">
+          <div class="group-header">
+            <span>05</span>
+            <div>
+              <h3>状态、备份与恢复</h3>
+              <p>恢复会读取 manifest，目标是回到那次写入之前的状态。</p>
+            </div>
+          </div>
+
+          <div class="restore-row">
+            <select id="backupSelect" aria-label="选择备份">
+              <option value="">暂无备份</option>
+            </select>
+            <button id="restoreBtn" class="danger" type="button">恢复所选备份</button>
+          </div>
+
+          <div class="button-row">
+            <button id="protectBtn" class="secondary" type="button">开启只读</button>
+            <button id="unprotectBtn" class="secondary" type="button">关闭只读</button>
+          </div>
+
+          <div id="backupDetails" class="mini-card muted">
+            暂无备份信息。
+          </div>
+
+          <pre id="logBox" class="log-box">等待操作。</pre>
+        </section>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
