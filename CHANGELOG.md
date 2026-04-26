@@ -1,12 +1,19 @@
 # 更新日志
 
+## 0.1.2
+
+- 修正致谢方向：重点补充 DLSSTweaks、RenoDX、ReShade、Special K 等社区图形工具的引用与边界说明。
+- 明确本项目不包含上述项目的二进制文件，不注入游戏进程，不修改游戏安装目录。
+- 在 README、README.en、NOTICE、ACKNOWLEDGEMENTS、docs/07、FAQ 和 Release notes 模板中同步说明。
+
 ## 0.1.1
 
 - 重做 WebUI：改为 macOS 设置风格，左侧导航、右侧设置分组，降低渐变和大装饰元素。
 - 保留浅色和深色两套主题，移动端改为单列设置页。
 - 补齐 GitHub-ready 文档：中英文 README、快速使用、原理说明、备份恢复、上传指南、常见问题和发布检查清单。
 - 统一中文发布名为“异环原生 HDR 一键开启工具”，短名“异环 HDR 面板”，英文名“NTE HDR Panel”。
-- 补充搜索关键词矩阵、仓库描述、GitHub Topics 建议、参考项目致谢和链接引用。
+- 补充搜索关键词矩阵、仓库描述、GitHub Topics 建议、相关社区工具引用与区分、参考项目致谢和链接引用。
+- 补充 DLSSTweaks、RenoDX、ReShade、Special K 的致谢与边界说明。
 - 新增 `CONTRIBUTING.md`、`SECURITY.md`、`NOTICE.md`、`LICENSE`、`.gitattributes`、`.gitignore`。
 - 新增 GitHub Actions Windows 构建 workflow。
 - 新增发布说明模板和本地 release 打包脚本。

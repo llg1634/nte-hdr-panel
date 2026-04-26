@@ -10,6 +10,13 @@ This is a local WebUI for enabling Unreal Engine native HDR output in Neverness 
 
 ## Credits
 
+Related community tools:
+
+- [DLSSTweaks](https://github.com/emoose/DLSSTweaks) / [NexusMods page](https://www.nexusmods.com/site/mods/550): DLSS wrapper / tweak tool. This project does not include DLSSTweaks binaries and does not write `dlsstweaks.ini`.
+- [RenoDX](https://github.com/clshortfuse/renodx): DirectX game HDR / tonemapping / shader modification toolset. This project is not a RenoDX add-on.
+- [ReShade](https://github.com/crosire/reshade) / [website](https://reshade.me/): generic post-processing injector. This project is not a ReShade preset and does not apply post-processing filters.
+- [Special K](https://github.com/SpecialKO/SpecialK) / [website](https://www.special-k.info/): PC game enhancement, diagnostics, and HDR retrofit tool. This project does not use Special K injection.
+
 The local WebUI structure, manifest-based backup / restore workflow, HUD verification flow, backend shutdown action, and GitHub-ready documentation layout are based on the author's related project:
 
 - [llg1634/nte-dlss-panel](https://github.com/llg1634/nte-dlss-panel)

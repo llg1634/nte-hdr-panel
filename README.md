@@ -42,6 +42,13 @@ http://127.0.0.1:22533
 
 ## 参考与致谢
 
+相关社区工具引用和区分：
+
+- [DLSSTweaks](https://github.com/emoose/DLSSTweaks) / [NexusMods 发布页](https://www.nexusmods.com/site/mods/550)：DLSS wrapper / tweak 工具。本项目不包含 DLSSTweaks DLL，不写 `dlsstweaks.ini`。
+- [RenoDX](https://github.com/clshortfuse/renodx)：DirectX 游戏 HDR / tonemapping / shader 改造工具集。本项目不是 RenoDX add-on。
+- [ReShade](https://github.com/crosire/reshade) / [官网](https://reshade.me/)：通用 post-processing injector。本项目不是 ReShade preset，不做后处理滤镜。
+- [Special K](https://github.com/SpecialKO/SpecialK) / [官网](https://www.special-k.info/)：PC 游戏增强、诊断和 HDR 改造工具。本项目不使用 Special K injection。
+
 本项目的本地 WebUI 结构、manifest 备份恢复、HUD 验证、退出后端按钮、GitHub-ready 文档组织，参考了同作者项目：
 
 - [llg1634/nte-dlss-panel](https://github.com/llg1634/nte-dlss-panel)

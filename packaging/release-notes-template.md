@@ -41,6 +41,17 @@ HDR Mode: Custom
 
 ## 参考与致谢
 
+相关社区工具引用和区分：
+
+```text
+DLSSTweaks: https://github.com/emoose/DLSSTweaks
+RenoDX: https://github.com/clshortfuse/renodx
+ReShade: https://github.com/crosire/reshade
+Special K: https://github.com/SpecialKO/SpecialK
+```
+
+本项目不包含这些项目的二进制文件，不注入游戏进程，不修改游戏安装目录。
+
 本项目的 WebUI、manifest 备份恢复、HUD 验证和 GitHub-ready 文档组织参考：
 
 ```text
