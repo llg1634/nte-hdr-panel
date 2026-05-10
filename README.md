@@ -66,6 +66,7 @@ http://127.0.0.1:22533
 - 零路径配置：默认定位 `%LOCALAPPDATA%\HT\Saved\Config\Windows`。
 - 原生 HDR：写入 UE RendererSettings，不使用 RTX HDR / 自动 HDR 滤镜。
 - 自动备份恢复：每次写入都会生成独立 manifest。
+- 原版回退按钮：可一键恢复最早那份“未配置 HDR”的原始 `Engine.ini` 备份。
 - 只读保护：默认阻止游戏启动阶段清理 `Engine.ini`。
 - HUD 验证：可开启/关闭 NVIDIA DLSS HUD。
 - 后端退出按钮：关闭网页不等于退出工具，面板提供“退出工具”按钮。
@@ -132,8 +133,9 @@ NTEHDRPanel.exe
 2. 选择 HDR 参数，先用 `1000 / 18 / 1.0`。
 3. 保持“写入后设为只读”勾选。
 4. 点“备份并写入原生 HDR”。
-5. 启动异环。
-6. 用 NVIDIA HUD 看是否显示 `DX12` / `D3D12` 和 `HDR Mode: Custom`。
+5. 如需回退到原版，不要手动挑备份，直接点“恢复未配置 HDR 的原版”。
+6. 启动异环。
+7. 用 NVIDIA HUD 看是否显示 `DX12` / `D3D12` 和 `HDR Mode: Custom`。
 
 ## 备份位置
 
@@ -162,6 +164,14 @@ Engine.ini
 如果原文件只读，恢复后保持只读。
 
 也就是说，恢复目标是“回到那次写入之前的状态”。
+
+另外，面板会自动识别“最早一份未配置 HDR 的原版备份”，并提供单独按钮：
+
+```text
+恢复未配置 HDR 的原版
+```
+
+这个按钮不依赖下拉框选择，固定恢复到当前识别出的原版配置候选。
 
 ## NVIDIA HUD
 
@@ -209,4 +219,17 @@ build_exe.bat
 
 ```text
 dist\NTEHDRPanel\NTEHDRPanel.exe
+```
+
+完整发版打包：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File packaging\build-release.ps1 -Version 0.1.3
+```
+
+会同时生成：
+
+```text
+release-artifacts\NTEHDRPanel-v0.1.3.zip
+release-artifacts\NTEHDRPanel-v0.1.3.exe
 ```

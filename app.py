@@ -214,6 +214,24 @@ def list_backups(config_dir: Path) -> list[dict]:
     return rows
 
 
+def is_non_hdr_backup(backup: dict) -> bool:
+    if not backup.get("engineExisted"):
+        return False
+    if backup.get("engineKind") == "hdr-config":
+        return False
+    return True
+
+
+def find_original_backup(config_dir: Path) -> dict | None:
+    candidates = list_backups(config_dir)
+    # "Original" means the oldest available backup that existed before the tool
+    # wrote HDR settings and did not itself contain HDR renderer parameters.
+    original = [backup for backup in candidates if is_non_hdr_backup(backup)]
+    if not original:
+        return None
+    return sorted(original, key=lambda item: item["name"])[0]
+
+
 def running_processes() -> list[dict]:
     if os.name != "nt":
         return []
@@ -344,6 +362,7 @@ def build_hdr_ini(settings: dict) -> tuple[str, dict[str, str]]:
 
 def inspect_config(config_dir_value: str | None = None) -> dict:
     config_dir = config_dir_from_value(config_dir_value)
+    original_backup = find_original_backup(config_dir) if config_dir.is_dir() else None
     engine = config_dir / CONFIG_FILE
     info = {
         "defaultConfigDir": str(default_config_dir()),
@@ -351,6 +370,7 @@ def inspect_config(config_dir_value: str | None = None) -> dict:
         "configDirExists": config_dir.is_dir(),
         "engine": file_record(engine),
         "backups": list_backups(config_dir),
+        "originalBackup": original_backup,
         "processes": running_processes(),
         "hud": read_hud_status(),
     }
@@ -364,6 +384,7 @@ def inspect_config(config_dir_value: str | None = None) -> dict:
         "protectedByReadonly": bool(engine_info.get("readonly")),
         "needsGameRun": not info["configDirExists"],
         "looksGameGenerated": kind == "game-generated-or-encoded",
+        "hasOriginalBackup": bool(original_backup),
     }
     return info
 
@@ -450,6 +471,21 @@ def restore_backup(config_dir_value: str | None, backup_name: str | None = None)
         "operations": operations,
         "status": inspect_config(str(config_dir)),
     }
+
+
+def restore_original_backup(config_dir_value: str | None) -> dict:
+    config_dir = config_dir_from_value(config_dir_value)
+    if not config_dir.is_dir():
+        raise AppError("配置目录不存在，无法恢复原版配置。")
+
+    original = find_original_backup(config_dir)
+    if not original:
+        raise AppError("没有找到未配置 HDR 的原版备份。")
+
+    result = restore_backup(str(config_dir), original["name"])
+    result["message"] = f"已恢复未配置 HDR 的原版配置：{original['name']}。"
+    result["originalBackup"] = original
+    return result
 
 
 def set_engine_protection(config_dir_value: str | None, read_only: bool) -> dict:
@@ -583,6 +619,9 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if parsed.path == "/api/restore":
                 self.send_json(restore_backup(data.get("configDir"), data.get("backup")))
+                return
+            if parsed.path == "/api/restore-original":
+                self.send_json(restore_original_backup(data.get("configDir")))
                 return
             if parsed.path == "/api/protect":
                 self.send_json(set_engine_protection(data.get("configDir"), bool(data.get("readOnly"))))

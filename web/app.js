@@ -16,6 +16,7 @@ const hudCard = $("hudCard");
 const statusStrip = $("statusStrip");
 const backupSelect = $("backupSelect");
 const backupDetails = $("backupDetails");
+const originalBackupCard = $("originalBackupCard");
 const logBox = $("logBox");
 const filePlan = $("filePlan");
 const assetPill = $("assetPill");
@@ -90,6 +91,7 @@ function renderDetection(status) {
   `;
 
   renderBackups(status.backups || [], status.configDir);
+  renderOriginalBackup(status.originalBackup);
   renderStatus(status);
   renderHud(status.hud);
 }
@@ -100,6 +102,7 @@ function renderStatus(status) {
   if (status.summary?.hasHdr) parts.push("HDR 参数存在");
   if (status.summary?.looksGameGenerated) parts.push("当前像游戏原始编码配置");
   if (status.summary?.protectedByReadonly) parts.push("只读保护");
+  if (status.summary?.hasOriginalBackup) parts.push("可回退原版配置");
   if (status.processes?.length) parts.push("检测到异环相关进程");
   statusStrip.innerHTML = parts.map((part) => `<span>${part}</span>`).join("");
   const engine = status.engine || {};
@@ -129,6 +132,25 @@ function renderBackups(backups, configDir) {
   }
   backupDetails.classList.remove("muted");
   renderBackupDetails();
+}
+
+function renderOriginalBackup(originalBackup) {
+  if (!originalBackup) {
+    originalBackupCard.classList.add("muted");
+    originalBackupCard.innerHTML = `
+      <strong>未找到原版备份</strong><br>
+      还没有识别到“未配置 HDR 的原始 Engine.ini”备份，当前无法一键回退到原版配置。
+    `;
+    return;
+  }
+
+  originalBackupCard.classList.remove("muted");
+  originalBackupCard.innerHTML = `
+    <strong>原版配置候选</strong>：${originalBackup.name}<br>
+    路径：<code>${originalBackup.path}</code><br>
+    类型：${originalBackup.engineKind || "unknown"}<br>
+    说明：这是当前找到的最早一份未配置 HDR 的 Engine.ini 备份，点击上方按钮会直接恢复它。
+  `;
 }
 
 function renderBackupDetails() {
@@ -236,6 +258,22 @@ async function restoreBackup() {
   }
 }
 
+async function restoreOriginalBackup() {
+  setBusy(true);
+  try {
+    const data = await request("/api/restore-original", {
+      method: "POST",
+      body: JSON.stringify({ configDir: configPath.value.trim() }),
+    });
+    renderDetection(data.status);
+    showToast("已恢复未配置 HDR 的原版配置。");
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    setBusy(false);
+  }
+}
+
 async function setProtection(enabled) {
   setBusy(true);
   try {
@@ -304,6 +342,7 @@ $("browseBtn").addEventListener("click", browsePath);
 $("detectBtn").addEventListener("click", () => refreshState(true));
 $("openDirBtn").addEventListener("click", copyPath);
 $("applyBtn").addEventListener("click", applyHdr);
+$("restoreOriginalBtn").addEventListener("click", restoreOriginalBackup);
 $("restoreBtn").addEventListener("click", restoreBackup);
 $("protectBtn").addEventListener("click", () => setProtection(true));
 $("unprotectBtn").addEventListener("click", () => setProtection(false));

@@ -1,5 +1,5 @@
 param(
-  [string]$Version = "0.1.1"
+  [string]$Version = "0.1.3"
 )
 
 $ErrorActionPreference = "Stop"
@@ -7,6 +7,8 @@ $Root = Resolve-Path (Join-Path $PSScriptRoot "..")
 $ReleaseDir = Join-Path $Root "release-artifacts"
 $ZipName = "NTEHDRPanel-v$Version.zip"
 $ZipPath = Join-Path $ReleaseDir $ZipName
+$OneFileName = "NTEHDRPanel-v$Version.exe"
+$OneFilePath = Join-Path $ReleaseDir $OneFileName
 
 Set-Location $Root
 New-Item -ItemType Directory -Force -Path $ReleaseDir | Out-Null
@@ -18,6 +20,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 pyinstaller --noconfirm --name NTEHDRPanel --noconsole --add-data "web;web" app.py
+pyinstaller --noconfirm --onefile --noconsole --name "NTEHDRPanel-v$Version" --add-data "web;web" app.py
 
 $PackageRoot = Join-Path $ReleaseDir "NTEHDRPanel-v$Version"
 if (Test-Path $PackageRoot) {
@@ -46,4 +49,7 @@ if (Test-Path $ZipPath) {
 }
 Compress-Archive -Path (Join-Path $PackageRoot "*") -DestinationPath $ZipPath
 
+Copy-Item -LiteralPath (Join-Path $Root "dist\$OneFileName") -Destination $OneFilePath -Force
+
 Write-Host "Release package created: $ZipPath"
+Write-Host "One-file exe created: $OneFilePath"

@@ -8,6 +8,8 @@ Search keywords: NTE HDR, Neverness To Everness HDR, Ananta HDR, native HDR, UE 
 
 This is a local WebUI for enabling Unreal Engine native HDR output in Neverness To Everness / Ananta. It writes HDR renderer settings to the local `Engine.ini`, creates manifest-based backups, restores previous state, applies optional read-only protection, and provides an NVIDIA HUD toggle for verification.
 
+It also supports a dedicated original rollback action: restoring the oldest known backup of the pre-HDR, non-modified `Engine.ini`.
+
 ## Credits
 
 Related community tools:
@@ -75,7 +77,8 @@ For that reason, the UI enables read-only protection by default.
 4. Start with `1000 / 18 / 1.0`.
 5. Keep "read-only after write" enabled.
 6. Click "Backup and write native HDR".
-7. Launch the game and verify `DX12` / `D3D12` and `HDR Mode: Custom` with NVIDIA HUD.
+7. If you want to return to the non-HDR original state, use the dedicated "Restore original non-HDR version" button.
+8. Launch the game and verify `DX12` / `D3D12` and `HDR Mode: Custom` with NVIDIA HUD.
 
 If the HUD toggle cannot write the registry, run `run_as_admin.bat`.
 
@@ -89,6 +92,8 @@ Each write creates:
 
 The backup contains `manifest.json` and the original `Engine.ini` when it existed. Restore follows the manifest instead of blindly deleting files.
 
+The UI also detects the oldest backup that existed before HDR was written and did not itself contain HDR renderer settings, then exposes it as the dedicated original rollback target.
+
 ## Build
 
 ```bat
@@ -99,4 +104,17 @@ Output:
 
 ```text
 dist\NTEHDRPanel\NTEHDRPanel.exe
+```
+
+Full release packaging:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File packaging\build-release.ps1 -Version 0.1.3
+```
+
+This generates both:
+
+```text
+release-artifacts\NTEHDRPanel-v0.1.3.zip
+release-artifacts\NTEHDRPanel-v0.1.3.exe
 ```

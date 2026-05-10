@@ -203,8 +203,16 @@
             <span>05</span>
             <div>
               <h3>状态、备份与恢复</h3>
-              <p>恢复会读取 manifest，目标是回到那次写入之前的状态。</p>
+              <p>支持两种恢复：恢复所选备份，或一键恢复未配置 HDR 的原版配置。</p>
             </div>
+          </div>
+
+          <div id="originalBackupCard" class="mini-card muted">
+            正在查找未配置 HDR 的原版备份。
+          </div>
+
+          <div class="button-row">
+            <button id="restoreOriginalBtn" class="primary" type="button">恢复未配置 HDR 的原版</button>
           </div>
 
           <div class="restore-row">
